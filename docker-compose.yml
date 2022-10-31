@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  apt-cacher-ng:
+    restart: unless-stopped
+    image: apt-cacher-ng
+    container_name: cacher
+    build:
+      context: ./
+      args:
+        - GIT_PROXY=${GIT_PROXY:-}
+    env_file:
+      - .env
+    init: true
+    ports:
+      - "3142:3142"
+    volumes:
+      - ./cache:/var/cache/apt-cacher-ng
+      - ./log:/var/log/apt-cacher-ng
+#alpine
+#      - /etc/timezone:/etc/timezone:ro
+#ubuntu
+      - /etc/localtime:/etc/localtime:ro
+#    networks:
+#      cacher:
+
+networks:
+#  cacher:
+  default:
+    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 10.201.0.0/24
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+      com.docker.network.bridge.name: "docker_cacher"
