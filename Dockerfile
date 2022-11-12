@@ -14,7 +14,8 @@ VOLUME ["/var/cache/apt-cacher-ng"]
 RUN --mount=type=cache,target=/var/cache/apt/archives --mount=type=cache,target=/var/lib/apt \
     if [ ! -z "${APT_PROXY}" ] ; then \
     apt update && apt install --no-install-recommends -yq netcat && \
-    if nc -zv ${PROXY_HOST} ${PROXY_PORT} ; then (eval ${APT_PROXY:-};); fi; fi && \
+    if nc -zv ${PROXY_HOST} ${PROXY_PORT} ; then (eval ${APT_PROXY:-};); fi && \
+    apt purge -yq netcat && apt autoremove -yq; fi && \
     rm -rf /etc/apt/apt.conf.d/docker-clean && \
     apt update && apt install --no-install-recommends -yq apt-cacher-ng ca-certificates && \
     # Append PassThroughPattern config for SSL/TLS proxying (optional)
