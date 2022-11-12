@@ -7,4 +7,4 @@ export BUILDKIT_PROGRESS=plain
 . ./.env
 
 #docker-compose pull
-docker-compose build --build-arg GIT_PROXY="${GIT_PROXY}" --pull --parallel #--no-cache
+docker-compose build --pull --parallel #--no-cache

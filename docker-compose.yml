@@ -10,6 +10,8 @@ services:
       context: ./
       args:
         - GIT_PROXY=${GIT_PROXY:-}
+        - PROXY_HOST=${PROXY_HOST:-}
+        - PROXY_PORT=${PROXY_PORT:-}
     env_file:
       - .env
     init: true

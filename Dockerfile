@@ -1,17 +1,22 @@
 # syntax=docker/dockerfile:latest
 # https://docs.docker.com/samples/apt-cacher-ng/
 FROM ubuntu:22.04
-ARG GIT_PROXY
+ARG APT_PROXY
+ARG PROXY_HOST
+ARG PROXY_PORT
 ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND}
 
 # Expose the cache directory for volume binding
 VOLUME ["/var/cache/apt-cacher-ng"]
 
 # Update apt-get cache
 RUN --mount=type=cache,target=/var/cache/apt/archives --mount=type=cache,target=/var/lib/apt \
-    (eval ${GIT_PROXY:-};) && \
+    if [ ! -z "${APT_PROXY}" ] ; then \
+    apt update && apt install --no-install-recommends -yq netcat && \
+    if nc -zv ${PROXY_HOST} ${PROXY_PORT} ; then (eval ${APT_PROXY:-};); fi; fi && \
     rm -rf /etc/apt/apt.conf.d/docker-clean && \
-    apt-get update && apt-get install --no-install-recommends -yq apt-cacher-ng ca-certificates && \
+    apt update && apt install --no-install-recommends -yq apt-cacher-ng ca-certificates && \
     # Append PassThroughPattern config for SSL/TLS proxying (optional)
     sed -e 's|^[# ]*\(ForeGround:\).*|\1 1|' \
         -e 's|^[# ]*\(PassThroughPattern: \.\*\).*|\1|' \
